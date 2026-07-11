@@ -33,3 +33,20 @@ def repair_stock_route(db_path):
     except Exception as e:
         pass
     conn.commit()
+
+# === Stage 39: Add a repair function for simple data integrity issues ===
+# Project: StockRoute
+def repair_stock_records(records):
+    """Recover records by filling missing batch_id, checkpoint_seq, status, and notes."""
+    seen_batches = {}
+    for i, rec in enumerate(records):
+        if "batch_id" not in rec or rec["batch_id"] is None:
+            rec["batch_id"] = f"B{i}"
+            seen_batches[rec["batch_id"]] = rec
+        if "checkpoint_seq" not in rec or rec["checkpoint_seq"] is None:
+            rec["checkpoint_seq"] = i + 1
+        if "status" not in rec or rec["status"] is None:
+            rec["status"] = "pending"
+        if "notes" not in rec or rec["notes"] is None:
+            rec["notes"] = ""
+    return records
